@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women SOS Portal</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- AOS Animation CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon"
+          href="https://i.pinimg.com/564x/74/f4/08/74f4082ad311e15bc4680fcf0ea89f75.jpg">
+
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .hero {
+            height: 100vh;
+            background: url('https://wallpapercave.com/wp/wp8245218.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: bold;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 30px;
+            padding: 10px 20px;
+        }
+        .features {
+            padding: 60px 0;
+        }
+        .feature-item {
+            padding: 20px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<section class="hero" data-aos="fade-up">
+    <div class="container">
+        <h1>Women SOS Portal</h1>
+        <p class="lead">A website about women safety </p>
+        <a href="/signup" class="btn btn-custom">Get Started</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features" data-aos="fade-up">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 feature-item" data-aos="zoom-in">
+                <h3>Emergency Communication</h3>
+                <p>By using our app you can directly connect with pre-selected members</p>
+            </div>
+            <div class="col-md-4 feature-item" data-aos="zoom-in" data-aos-delay="100">
+                <h3>Safety alerts</h3>
+                <p>Send Trigger SOS signal when danger detected.</p>
+            </div>
+            <div class="col-md-4 feature-item" data-aos="zoom-in" data-aos-delay="200">
+                <h3>Offline alert feature</h3>
+                <p>you can send alerts to the emergency contacts through SMS.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer data-aos="fade-in">
+    <p>&copy; 2024 My Awesome Website</p>
+</footer>
+
+<!-- AOS and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+    AOS.init();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Form with Police Stations</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Quantum Alerts CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quantum-alerts@1.0.3/dist/quantum-alerts.min.css">
+
+    <!-- AOS CSS (Animate On Scroll) -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <style>
+        body {
+            background: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 700;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #bg2{
+            background-color: #DCDCDC;
+        }
+
+        label {
+            margin-top: 10px;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+        button {
+            margin-top: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body id="bg2">
+
+<h1 data-aos="fade-down">Location Form</h1>
+
+<div class="form-container" data-aos="fade-up">
+    <div class="alert alert-info quantum-alert quantum-alert-info" role="alert">
+        Please fill out the form and allow access to your location.
+    </div>
+
+    <form id="locationForm" method="POST" action="/submit">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="mobile" class="form-label">Mobile Number:</label>
+            <input type="text" id="mobile" name="mobile" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="emergency_contact" class="form-label">Emergency Contact Number:</label>
+            <input type="text" id="emergency_contact" name="emergency_contact" class="form-control" required>
+        </div>
+
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+
+        <div id="map"></div>
+
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+    </form>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Quantum Alerts JS -->
+<script src="https://cdn.jsdelivr.net/npm/quantum-alerts@1.0.3/dist/quantum-alerts.min.js"></script>
+
+<!-- AOS JS -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    AOS.init();
+
+    var map = L.map('map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    // Enable high-accuracy positioning with the geolocation API
+    map.locate({ setView: true, maxZoom: 16, enableHighAccuracy: true });
+
+    // Store latitude and longitude in hidden form fields
+    function onLocationFound(e) {
+        var radius = Math.min(e.accuracy / 2, 5);  // Limit the radius to 5 meters maximum
+
+        // Display accuracy info
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+        L.circle(e.latlng, { radius: 5 }).addTo(map);  // Set circle radius to exactly 5 meters
+
+        document.getElementById('latitude').value = e.latlng.lat;
+        document.getElementById('longitude').value = e.latlng.lng;
+
+        // Find nearby police stations
+        findNearbyPoliceStations(e.latlng.lat, e.latlng.lng);
+    }
+
+    map.on('locationfound', onLocationFound);
+
+    map.on('locationerror', function () {
+        alert("Unable to retrieve location.");
+    });
+
+    // Define a green icon for police stations
+    var greenIcon = L.icon({
+        iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    });
+
+    // Function to find nearby police stations using Overpass API
+    function findNearbyPoliceStations(lat, lng) {
+        var overpassUrl = "https://overpass-api.de/api/interpreter";
+        var query = `[out:json];node["amenity"="police"](around:5000,${lat},${lng});out;`;  // 5km radius
+
+        fetch(overpassUrl, {
+            method: 'POST',
+            body: query,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Add police stations as markers on the map with green icons
+                data.elements.forEach(station => {
+                    var stationLatLng = [station.lat, station.lon];
+                    var stationName = station.tags.name || "Police Station";
+
+                    L.marker(stationLatLng, { icon: greenIcon }).addTo(map)
+                        .bindPopup(stationName)
+                        .openPopup();
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching police stations:', error);
+            });
+    }
+</script>
+
+</body>
+
+</html>
